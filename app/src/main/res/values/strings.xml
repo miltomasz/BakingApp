@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">BakingApp</string>
+    <string name="error_message">No recipes found</string>
+</resources>

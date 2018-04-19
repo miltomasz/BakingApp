@@ -20,30 +20,34 @@
             android:layout_height="match_parent">
 
             <TextView
-                android:id="@+id/recipe_name"
+                android:id="@+id/recipeIngredientsLabel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/base_margin"
                 android:layout_marginTop="@dimen/base_margin"
                 android:layout_marginLeft="@dimen/base_margin"
-                tools:text="Recipe name"
+                android:text="@string/ingredients_label"
+                tools:text="Ingredients"
                 android:textAppearance="@style/TextAppearance.AppCompat.Large"
                 card_view:layout_constraintStart_toStartOf="parent"
                 card_view:layout_constraintTop_toTopOf="parent" />
 
             <TextView
-                android:id="@+id/steps_servings_count"
-                android:layout_width="wrap_content"
+                android:id="@+id/recipeIngredients"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="@dimen/base_margin"
+                android:layout_marginEnd="8dp"
                 android:layout_marginStart="@dimen/base_margin"
-                android:layout_marginTop="@dimen/base_margin"
                 android:layout_marginLeft="@dimen/base_margin"
+                android:layout_marginRight="8dp"
+                android:layout_marginTop="@dimen/base_margin"
                 android:textAppearance="@style/TextAppearance.AppCompat.Medium"
                 card_view:layout_constraintBottom_toBottomOf="parent"
+                card_view:layout_constraintEnd_toEndOf="parent"
                 card_view:layout_constraintStart_toStartOf="parent"
-                card_view:layout_constraintTop_toBottomOf="@+id/recipe_name"
-                tools:text="5 steps, 8 servings" />
+                card_view:layout_constraintTop_toBottomOf="@+id/recipeIngredientsLabel"
+                tools:text="One, two, three..." />
 
         </android.support.constraint.ConstraintLayout>
 

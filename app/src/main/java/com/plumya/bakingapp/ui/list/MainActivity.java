@@ -2,6 +2,7 @@ package com.plumya.bakingapp.ui.list;
 
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -22,7 +23,7 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements RecipesAdapter.RecipesOnClickHandler {
 
     private static final String LOG_TAG = MainActivity.class.getSimpleName();
     private static final int CACHE_SIZE = 20;
@@ -85,8 +86,15 @@ public class MainActivity extends AppCompatActivity {
         recipesRv.setHasFixedSize(true);
         recipesRv.setItemViewCacheSize(CACHE_SIZE);
         recipesRv.setDrawingCacheEnabled(true);
-        recipesAdapter = new RecipesAdapter(this);
+        recipesAdapter = new RecipesAdapter(this, MainActivity.this);
         recipesRv.setAdapter(recipesAdapter);
         recipesRv.setSaveEnabled(true);
+    }
+
+    @Override
+    public void onClick(Recipe recipe) {
+        Intent intent = new Intent(this, RecipeStepsActivity.class);
+        intent.putExtra(RecipeStepsActivity.RECIPE_ID, recipe.id);
+        startActivity(intent);
     }
 }

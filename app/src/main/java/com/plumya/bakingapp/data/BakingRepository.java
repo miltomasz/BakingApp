@@ -82,4 +82,8 @@ public class BakingRepository {
         initializeData();
         return recipeDao.getRecipes();
     }
+
+    public LiveData<RecipeEntry> getRecipe(long id) {
+        return recipeDao.getRecipe(id);
+    }
 }

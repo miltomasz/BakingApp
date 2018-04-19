@@ -22,10 +22,12 @@ import butterknife.ButterKnife;
 public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.ViewHolder> {
 
     private List<Recipe> recipes;
+    private RecipesOnClickHandler clickHandler;
     private Context context;
 
-    public RecipesAdapter(Context context) {
+    public RecipesAdapter(Context context, RecipesOnClickHandler clickHandler) {
         this.context = context;
+        this.clickHandler = clickHandler;
     }
 
     public void setRecipes(List<Recipe> recipes) {
@@ -57,7 +59,7 @@ public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.ViewHold
         return recipes.size();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
+    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         @BindView(R.id.recipe_name)
         TextView recipeNameTv;
 
@@ -67,7 +69,19 @@ public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.ViewHold
         public ViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
+            itemView.setOnClickListener(this);
         }
+
+        @Override
+        public void onClick(View view) {
+            int position = getAdapterPosition();
+            Recipe recipe = recipes.get(position);
+            clickHandler.onClick(recipe);
+        }
+    }
+
+    public interface RecipesOnClickHandler {
+        void onClick(Recipe recipe);
     }
 }
 

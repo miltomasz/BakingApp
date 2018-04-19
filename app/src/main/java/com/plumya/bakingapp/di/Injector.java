@@ -8,6 +8,7 @@ import com.plumya.bakingapp.data.database.RecipeDao;
 import com.plumya.bakingapp.data.network.BakingService;
 import com.plumya.bakingapp.data.network.RecipeNetworkDataSource;
 import com.plumya.bakingapp.ui.list.MainViewModelFactory;
+import com.plumya.bakingapp.ui.list.RecipeStepsViewModelFactory;
 import com.plumya.bakingapp.utils.AppExecutors;
 
 import okhttp3.OkHttpClient;
@@ -66,5 +67,10 @@ public class Injector {
     public static MainViewModelFactory provideMainActivityViewModelFactory(Context context) {
         BakingRepository bakingRepository = provideBakingRespository(context.getApplicationContext());
         return new MainViewModelFactory(bakingRepository);
+    }
+
+    public static RecipeStepsViewModelFactory provideRecipeStepsViewModelFactory(Context context) {
+        BakingRepository bakingRepository = provideBakingRespository(context.getApplicationContext());
+        return new RecipeStepsViewModelFactory(bakingRepository);
     }
 }

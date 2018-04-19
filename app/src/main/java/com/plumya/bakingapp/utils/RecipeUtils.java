@@ -1,7 +1,11 @@
 package com.plumya.bakingapp.utils;
 
+import android.content.Context;
+import android.text.TextUtils;
+
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.plumya.bakingapp.R;
 import com.plumya.bakingapp.data.database.RecipeEntry;
 import com.plumya.bakingapp.data.model.Ingredient;
 import com.plumya.bakingapp.data.model.Recipe;
@@ -57,5 +61,16 @@ public class RecipeUtils {
             recipeEntries[i] = RecipeUtils.toEntry(recipes.get(i));
         }
         return recipeEntries;
+    }
+
+    public static String displayIngredients(Context context, Recipe recipe) {
+        if (recipe == null || recipe.ingredients == null) {
+            return context.getString(R.string.no_ingredients_msg);
+        }
+        List<String> ingredients = new ArrayList<>();
+        for (Ingredient ingredient : recipe.ingredients) {
+            ingredients.add(ingredient.ingredient);
+        }
+        return TextUtils.join(", ", ingredients);
     }
 }

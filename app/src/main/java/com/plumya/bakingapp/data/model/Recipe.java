@@ -1,12 +1,13 @@
 package com.plumya.bakingapp.data.model;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
  * Created by miltomasz on 13/04/18.
  */
 
-public class Recipe {
+public class Recipe implements Serializable {
     public long id;
     public String name;
     public List<Ingredient> ingredients;

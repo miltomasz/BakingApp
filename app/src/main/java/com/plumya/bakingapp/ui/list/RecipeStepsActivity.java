@@ -2,6 +2,7 @@ package com.plumya.bakingapp.ui.list;
 
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -14,9 +15,14 @@ import android.widget.TextView;
 
 import com.plumya.bakingapp.R;
 import com.plumya.bakingapp.data.model.Recipe;
+import com.plumya.bakingapp.data.model.Step;
 import com.plumya.bakingapp.di.Injector;
 import com.plumya.bakingapp.ui.adapter.RecipeStepsAdapter;
+import com.plumya.bakingapp.ui.view.RecipeStepDetailViewActivity;
 import com.plumya.bakingapp.utils.RecipeUtils;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -25,7 +31,7 @@ import butterknife.ButterKnife;
  * Created by miltomasz on 18/04/18.
  */
 
-public class RecipeStepsActivity extends AppCompatActivity {
+public class RecipeStepsActivity extends AppCompatActivity implements RecipeStepsAdapter.RecipeStepsOnClickHandler {
 
     public static final String RECIPE_ID = "recipeId";
     private static final String LOG_TAG = RecipeStepsActivity.class.getSimpleName();
@@ -63,7 +69,7 @@ public class RecipeStepsActivity extends AppCompatActivity {
             @Override
             public void onChanged(@Nullable Recipe recipe) {
                 if (noRecipeSteps(recipe)) {
-                    showEmptyError();
+                    showEmptyTextView();
                 } else {
                     showRecyclerView();
                     recipeStepsAdapter.setSteps(recipe.steps);
@@ -84,7 +90,7 @@ public class RecipeStepsActivity extends AppCompatActivity {
         progressBar.setVisibility(show ? View.VISIBLE : View.GONE);
     }
 
-    private void showEmptyError() {
+    private void showEmptyTextView() {
         emptyErrorTv.setVisibility(View.VISIBLE);
         recipesRv.setVisibility(View.GONE);
     }
@@ -99,11 +105,19 @@ public class RecipeStepsActivity extends AppCompatActivity {
         recipesRv.setLayoutManager(layoutManager);
         recipesRv.setHasFixedSize(true);
         recipesRv.setDrawingCacheEnabled(true);
-        recipeStepsAdapter = new RecipeStepsAdapter(this);
+        recipeStepsAdapter = new RecipeStepsAdapter(this, RecipeStepsActivity.this);
         recipesRv.setAdapter(recipeStepsAdapter);
         recipesRv.setSaveEnabled(true);
         DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(recipesRv.getContext(),
                 layoutManager.getOrientation());
         recipesRv.addItemDecoration(dividerItemDecoration);
+    }
+
+    @Override
+    public void onClick(long stepId, List<Step> steps) {
+        Intent intent = new Intent(this, RecipeStepDetailViewActivity.class);
+        intent.putExtra(RecipeStepDetailViewActivity.STEP_ID, stepId);
+        intent.putExtra(RecipeStepDetailViewActivity.STEPS, (ArrayList<Step>) steps);
+        startActivity(intent);
     }
 }

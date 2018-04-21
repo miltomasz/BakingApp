@@ -73,4 +73,13 @@ public class RecipeUtils {
         }
         return TextUtils.join(", ", ingredients);
     }
+
+    public static Step getStep(long stepId, List<Step> steps) {
+        for (int i = 0; i < steps.size(); i++) {
+            if (steps.get(i).id == stepId) {
+                return steps.get(i);
+            }
+        }
+        return null;
+    }
 }

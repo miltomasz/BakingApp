@@ -26,10 +26,12 @@ public class RecipeStepsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
     private List<Step> steps;
     private String ingredientsText;
+    private RecipeStepsOnClickHandler onClickHandler;
     private Context context;
 
-    public RecipeStepsAdapter(Context context) {
+    public RecipeStepsAdapter(Context context, RecipeStepsOnClickHandler onClickHandler) {
         this.context = context;
+        this.onClickHandler = onClickHandler;
     }
 
     public void setSteps(List<Step> steps) {
@@ -59,12 +61,11 @@ public class RecipeStepsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-        Step step = steps.get(position);
         if (holder.getItemViewType() == INGREDIENTS_VIEW_TYPE) {
             IngredientsViewHolder ingredientsViewHolder = (IngredientsViewHolder) holder;
             ingredientsViewHolder.recipeIngredientsTv.setText(ingredientsText);
-
         } else {
+            Step step = steps.get(position - 1);
             RegularViewHolder regularViewHolder = (RegularViewHolder) holder;
             regularViewHolder.shortDescriptionTv.setText(step.shortDescription);
             regularViewHolder.fullDescriptionTv.setText(step.description);
@@ -82,10 +83,10 @@ public class RecipeStepsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     @Override
     public int getItemCount() {
         if (steps == null) return 0;
-        return steps.size();
+        return steps.size() + 1;
     }
 
-    class RegularViewHolder extends RecyclerView.ViewHolder {
+    class RegularViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         @BindView(R.id.shortDescriptionTv)
         TextView shortDescriptionTv;
 
@@ -95,6 +96,14 @@ public class RecipeStepsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         public RegularViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
+            itemView.setOnClickListener(this);
+        }
+
+        @Override
+        public void onClick(View view) {
+            int position = getAdapterPosition();
+            Step step = steps.get(position - 1);
+            onClickHandler.onClick(step.id, steps);
         }
     }
 
@@ -109,6 +118,10 @@ public class RecipeStepsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             super(itemView);
             ButterKnife.bind(this, itemView);
         }
+    }
+
+    public interface RecipeStepsOnClickHandler {
+        void onClick(long stepId, List<Step> steps);
     }
 }
 

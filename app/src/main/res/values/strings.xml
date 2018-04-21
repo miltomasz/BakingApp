@@ -4,4 +4,7 @@
     <string name="recipe_steps_error_message">No recipes found</string>
     <string name="ingredients_label">Ingredients</string>
     <string name="no_ingredients_msg">No ingredients found</string>
+    <string name="next_btn">Next</string>
+    <string name="back_btn">Back</string>
+    <string name="problem_loading_step_msg">Problem occurred while loading step</string>
 </resources>

@@ -1,6 +1,7 @@
 package com.plumya.bakingapp.ui.view;
 
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -29,8 +30,8 @@ public class RecipeStepDetailViewActivity extends AppCompatActivity {
     private long stepId;
     private List<Step> steps;
     private ListIterator<Step> iterator;
-    private Step step;
 
+    @Nullable
     @BindView(R.id.recipeStepInstructionTv)
     TextView recipeStepInstructionTv;
 
@@ -51,6 +52,13 @@ public class RecipeStepDetailViewActivity extends AppCompatActivity {
         }
         iterator = steps.listIterator();
         setIteratorCursor();
+        hideToolbarIfLandscape();
+    }
+
+    private void hideToolbarIfLandscape() {
+        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            getSupportActionBar().hide();
+        }
     }
 
     private void setIteratorCursor() {
@@ -92,6 +100,8 @@ public class RecipeStepDetailViewActivity extends AppCompatActivity {
 
     private void setStepInstructions(Step step) {
         String instructions = step.description;
-        recipeStepInstructionTv.setText(instructions);
+        if (recipeStepInstructionTv != null) {
+            recipeStepInstructionTv.setText(instructions);
+        }
     }
 }

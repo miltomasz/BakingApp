@@ -14,7 +14,7 @@ import com.plumya.bakingapp.utils.RecipeUtils;
  * Created by miltomasz on 18/04/18.
  */
 
-class RecipeStepsActivityViewModel extends ViewModel {
+public class RecipeStepsActivityViewModel extends ViewModel {
 
     private LiveData<RecipeEntry> recipeEntry;
     private final BakingRepository bakingRepository;

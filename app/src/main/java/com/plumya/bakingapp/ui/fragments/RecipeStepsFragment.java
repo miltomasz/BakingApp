@@ -2,7 +2,7 @@ package com.plumya.bakingapp.ui.fragments;
 
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
-import android.content.Intent;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -23,10 +23,8 @@ import com.plumya.bakingapp.ui.adapter.RecipeStepsAdapter;
 import com.plumya.bakingapp.ui.list.RecipeStepsActivity;
 import com.plumya.bakingapp.ui.list.RecipeStepsActivityViewModel;
 import com.plumya.bakingapp.ui.list.RecipeStepsViewModelFactory;
-import com.plumya.bakingapp.ui.view.RecipeStepDetailViewActivity;
 import com.plumya.bakingapp.utils.RecipeUtils;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
@@ -36,10 +34,11 @@ import butterknife.ButterKnife;
  * Created by miltomasz on 24/04/18.
  */
 
-public class RecipeStepsFragment extends Fragment implements RecipeStepsAdapter.RecipeStepsOnClickHandler{
+public class RecipeStepsFragment extends Fragment implements RecipeStepsAdapter.RecipeStepsOnClickHandler {
+
+    private static final String LOG_TAG = RecipeStepsActivity.class.getSimpleName();
 
     public static final String RECIPE_ID = "recipeId";
-    private static final String LOG_TAG = RecipeStepsActivity.class.getSimpleName();
 
     private RecipeStepsAdapter recipeStepsAdapter;
     private RecipeStepsActivityViewModel viewModel;
@@ -53,21 +52,56 @@ public class RecipeStepsFragment extends Fragment implements RecipeStepsAdapter.
     @BindView(R.id.tv_error_message_display)
     TextView emptyErrorTv;
 
-    private long recipeId;
+    private OnItemClickListener callback;
 
-    public RecipeStepsFragment() {
+    public interface OnItemClickListener {
+        void onItemSelected(long stepId, List<Step> steps);
     }
+
+    private class RecipeObserver implements Observer<Recipe> {
+        @Override
+        public void onChanged(@Nullable Recipe recipe) {
+            if (noRecipeSteps(recipe)) {
+                showEmptyTextView();
+            } else {
+                showRecyclerView();
+                recipeStepsAdapter.setSteps(recipe.steps);
+                recipeStepsAdapter.setIngredientsText(
+                        RecipeUtils.displayIngredients(getActivity(), recipe)
+                );
+            }
+            showProgressBar(false);
+        }
+
+        private boolean noRecipeSteps(@Nullable Recipe recipe) {
+            return recipe == null || recipe.steps == null || recipe.steps.size() == 0;
+        }
+    }
+
+    public RecipeStepsFragment() {}
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+
+        // This makes sure that the host activity has implemented the callback interface
+        // If not, it throws an exception
+        try {
+            callback = (OnItemClickListener) context;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(context.toString()
+                    + " must implement OnImageClickListener");
+        }
+    }
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-
         final View rootView = inflater.inflate(R.layout.fragment_recipe_steps, container, false);
-
         ButterKnife.bind(this, rootView);
 
         initializeRecyclerView();
-
         showProgressBar(true);
 
         RecipeStepsViewModelFactory factory =
@@ -77,26 +111,7 @@ public class RecipeStepsFragment extends Fragment implements RecipeStepsAdapter.
         Bundle arguments = getArguments();
         long recipeId = arguments.getLong(RECIPE_ID, -1L);
         viewModel.selectRecipeId(recipeId);
-
-        viewModel.getRecipe().observe(this, new Observer<Recipe>() {
-            @Override
-            public void onChanged(@Nullable Recipe recipe) {
-                if (noRecipeSteps(recipe)) {
-                    showEmptyTextView();
-                } else {
-                    showRecyclerView();
-                    recipeStepsAdapter.setSteps(recipe.steps);
-                    recipeStepsAdapter.setIngredientsText(
-                            RecipeUtils.displayIngredients(getActivity(), recipe)
-                    );
-                }
-                showProgressBar(false);
-            }
-
-            private boolean noRecipeSteps(@Nullable Recipe recipe) {
-                return recipe == null || recipe.steps == null || recipe.steps.size() == 0;
-            }
-        });
+        viewModel.getRecipe().observe(this, new RecipeObserver());
 
         // Return the root view
         return rootView;
@@ -131,9 +146,6 @@ public class RecipeStepsFragment extends Fragment implements RecipeStepsAdapter.
 
     @Override
     public void onClick(long stepId, List<Step> steps) {
-        Intent intent = new Intent(getActivity(), RecipeStepDetailViewActivity.class);
-        intent.putExtra(RecipeStepDetailViewActivity.STEP_ID, stepId);
-        intent.putExtra(RecipeStepDetailViewActivity.STEPS, (ArrayList<Step>) steps);
-        startActivity(intent);
+        callback.onItemSelected(stepId, steps);
     }
 }

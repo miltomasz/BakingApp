@@ -21,7 +21,6 @@ public class RecipeStepsActivityViewModel extends ViewModel {
 
     public RecipeStepsActivityViewModel(BakingRepository repository) {
         this.bakingRepository = repository;
-//        this.recipeEntry = bakingRepository.getRecipe(recipeId);
     }
 
     public void selectRecipeId(long recipeId) {

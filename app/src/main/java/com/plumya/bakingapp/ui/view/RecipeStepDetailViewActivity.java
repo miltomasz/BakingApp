@@ -35,22 +35,19 @@ public class RecipeStepDetailViewActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_recipe_step_detail_view);
 
-        long stepId = -1;
-        List<Step> steps = null;
-
+        Bundle arguments = new Bundle();
         Intent intent = getIntent();
+
         if (intent.hasExtra(STEP_ID)) {
-            stepId = intent.getLongExtra(STEP_ID, 0);
-            steps = (List<Step>) intent.getSerializableExtra(STEPS);
+            long stepId = intent.getLongExtra(STEP_ID, -1);
+            List<Step> steps = (List<Step>) intent.getSerializableExtra(STEPS);
+            arguments.putLong(STEP_ID, stepId);
+            arguments.putSerializable(STEPS, (ArrayList<Step>) steps);
         } else {
             Toast
                     .makeText(this, R.string.problem_loading_step_msg, Toast.LENGTH_SHORT)
                     .show();
         }
-
-        Bundle arguments = new Bundle();
-        arguments.putLong(STEP_ID, stepId);
-        arguments.putSerializable(STEPS, (ArrayList<Step>) steps);
 
         if (savedInstanceState == null) {
             RecipeStepDetailViewFragment recipeStepDetailViewFragment = new RecipeStepDetailViewFragment();

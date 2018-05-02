@@ -30,8 +30,10 @@ import butterknife.BindView;
 public class RecipeStepsActivity extends AppCompatActivity implements RecipeStepsFragment.OnItemClickListener {
 
     public static final String RECIPE_ID = "recipeId";
-    private static final String LOG_TAG = RecipeStepsActivity.class.getSimpleName();
     public static final int STEP_NOT_FOUND = -1;
+
+    private static final String LOG_TAG = RecipeStepsActivity.class.getSimpleName();
+    public static final int FIRST_ITEM = 0;
 
     private boolean twoPane;
 
@@ -54,11 +56,10 @@ public class RecipeStepsActivity extends AppCompatActivity implements RecipeStep
         @Override
         public void onChanged(@Nullable Recipe recipe) {
             if (savedInstanceState == null) {
-                RecipeStepDetailViewFragment recipeStepDetailViewFragment = new RecipeStepDetailViewFragment();
-                recipeStepDetailViewFragment.selectedStep(getFirstStepId(recipe.steps), recipe.steps);
                 getSupportFragmentManager()
                         .beginTransaction()
-                        .add(R.id.recipe_instructions_fragment, recipeStepDetailViewFragment)
+                        .add(R.id.recipe_instructions_fragment,
+                                createRecipeStepDetailViewFragment(getFirstStepId(recipe.steps), recipe.steps))
                         .commit();
             }
         }
@@ -71,7 +72,7 @@ public class RecipeStepsActivity extends AppCompatActivity implements RecipeStep
 
         final long recipeId = getIntent().getLongExtra(RECIPE_ID, -1L);
 
-        if(savedInstanceState == null) {
+        if (savedInstanceState == null) {
             Bundle arguments = new Bundle();
             arguments.putLong(RECIPE_ID, recipeId);
             RecipeStepsFragment recipeStepsFragment = new RecipeStepsFragment();
@@ -98,21 +99,13 @@ public class RecipeStepsActivity extends AppCompatActivity implements RecipeStep
         }
     }
 
-    private long getFirstStepId(List<Step> steps) {
-        if (steps != null && steps.size() > 0) {
-            return steps.get(0).id;
-        }
-        return STEP_NOT_FOUND;
-    }
-
     @Override
     public void onItemSelected(long stepId, List<Step> steps) {
         if (twoPane) {
-            RecipeStepDetailViewFragment recipeStepDetailViewFragment = new RecipeStepDetailViewFragment();
-            recipeStepDetailViewFragment.selectedStep(stepId, steps);
             getSupportFragmentManager()
                     .beginTransaction()
-                    .replace(R.id.recipe_instructions_fragment, recipeStepDetailViewFragment)
+                    .replace(R.id.recipe_instructions_fragment,
+                            createRecipeStepDetailViewFragment(stepId, steps))
                     .commit();
         } else {
             Intent intent = new Intent(this, RecipeStepDetailViewActivity.class);
@@ -120,5 +113,21 @@ public class RecipeStepsActivity extends AppCompatActivity implements RecipeStep
             intent.putExtra(RecipeStepDetailViewActivity.STEPS, (ArrayList<Step>) steps);
             startActivity(intent);
         }
+    }
+
+    public RecipeStepDetailViewFragment createRecipeStepDetailViewFragment(long stepId, List<Step> steps) {
+        RecipeStepDetailViewFragment recipeStepDetailViewFragment = new RecipeStepDetailViewFragment();
+        Bundle arguments = new Bundle();
+        arguments.putLong(RecipeStepDetailViewFragment.STEP_ID, stepId);
+        arguments.putSerializable(RecipeStepDetailViewFragment.STEPS, (ArrayList<Step>) steps);
+        recipeStepDetailViewFragment.setArguments(arguments);
+        return recipeStepDetailViewFragment;
+    }
+
+    private long getFirstStepId(List<Step> steps) {
+        if (steps != null && steps.size() > 0) {
+            return steps.get(FIRST_ITEM).id;
+        }
+        return STEP_NOT_FOUND;
     }
 }

@@ -4,6 +4,7 @@ import android.content.Context;
 
 import com.plumya.bakingapp.data.BakingRepository;
 import com.plumya.bakingapp.data.database.BakingDatabase;
+import com.plumya.bakingapp.data.database.IngredientDao;
 import com.plumya.bakingapp.data.database.RecipeDao;
 import com.plumya.bakingapp.data.network.BakingService;
 import com.plumya.bakingapp.data.network.RecipeNetworkDataSource;
@@ -53,15 +54,13 @@ public class Injector {
         return retrofit.create(BakingService.class);
     }
 
-    public static RecipeDao provideRecipeDao() {
-        return null;
-    }
-
     public static BakingRepository provideBakingRespository(Context context) {
         BakingDatabase bakingDatabase = BakingDatabase.getInstance(context);
         RecipeNetworkDataSource recipeNetworkDataSource = provideNetworkDataSource(context);
         AppExecutors executors = AppExecutors.getInstance();
-        return BakingRepository.getInstance(bakingDatabase.recipeDao(), recipeNetworkDataSource, executors);
+        RecipeDao recipeDao = bakingDatabase.recipeDao();
+        IngredientDao ingredientDao = bakingDatabase.ingredientDao();
+        return BakingRepository.getInstance(recipeDao, ingredientDao, recipeNetworkDataSource, executors);
     }
 
     public static MainViewModelFactory provideMainActivityViewModelFactory(Context context) {

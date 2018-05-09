@@ -36,4 +36,6 @@ public abstract class BakingDatabase extends RoomDatabase {
 
     // The associated DAOs for the database
     public abstract RecipeDao recipeDao();
+
+    public abstract IngredientDao ingredientDao();
 }

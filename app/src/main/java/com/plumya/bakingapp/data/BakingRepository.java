@@ -5,6 +5,7 @@ import android.arch.lifecycle.Observer;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
+import com.plumya.bakingapp.data.database.IngredientDao;
 import com.plumya.bakingapp.data.database.RecipeDao;
 import com.plumya.bakingapp.data.database.RecipeEntry;
 import com.plumya.bakingapp.data.model.Recipe;
@@ -23,6 +24,7 @@ public class BakingRepository {
     private static final String LOG_TAG = BakingRepository.class.getSimpleName();
 
     private final RecipeDao recipeDao;
+    private final IngredientDao ingredientDao;
     private final RecipeNetworkDataSource recipeNetworkDataSource;
     private final AppExecutors executors;
 
@@ -31,9 +33,10 @@ public class BakingRepository {
     private static BakingRepository instance;
     private boolean initialized = false;
 
-    private BakingRepository(final RecipeDao recipeDao,
+    private BakingRepository(final RecipeDao recipeDao, IngredientDao ingredientDao,
                              RecipeNetworkDataSource recipeNetworkDataSource, AppExecutors appExecutors) {
         this.recipeDao = recipeDao;
+        this.ingredientDao = ingredientDao;
         this.recipeNetworkDataSource = recipeNetworkDataSource;
         this.executors = appExecutors;
 
@@ -55,12 +58,13 @@ public class BakingRepository {
     }
 
     public synchronized static BakingRepository getInstance(RecipeDao recipeDao,
+                                                            IngredientDao ingredientDao,
                                                             RecipeNetworkDataSource recipeNetworkDataSource,
                                                             AppExecutors appExecutors) {
         Log.d(LOG_TAG, "Getting the repository");
         if (instance == null) {
             synchronized (LOCK) {
-                instance = new BakingRepository(recipeDao, recipeNetworkDataSource, appExecutors);
+                instance = new BakingRepository(recipeDao, ingredientDao, recipeNetworkDataSource, appExecutors);
                 Log.d(LOG_TAG, "Made new repository");
             }
         }
@@ -85,5 +89,9 @@ public class BakingRepository {
 
     public LiveData<RecipeEntry> getRecipe(long id) {
         return recipeDao.getRecipe(id);
+    }
+
+    public String getIngredients(long recipeId) {
+        return ingredientDao.getIngredients(recipeId);
     }
 }

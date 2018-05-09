@@ -55,6 +55,12 @@ public class RecipeUtils {
         return new RecipeEntry(recipe.id, recipe.name, ingredients, steps, recipe.servings, recipe.image);
     }
 
+    public static List<Ingredient> toIngredients(String ingredientsString) {
+        List<Ingredient> ingredients = gson.fromJson(ingredientsString,
+                new TypeToken<List<Ingredient>>(){}.getType());
+        return ingredients;
+    }
+
     public static RecipeEntry[] toEntries(List<Recipe> recipes) {
         RecipeEntry[] recipeEntries = new RecipeEntry[recipes.size()];
         for (int i = 0; i < recipeEntries.length; i++) {

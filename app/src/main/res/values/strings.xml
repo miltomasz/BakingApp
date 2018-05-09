@@ -7,4 +7,7 @@
     <string name="next_btn">Next</string>
     <string name="back_btn">Back</string>
     <string name="problem_loading_step_msg">Problem occurred while loading step</string>
+    <string name="appwidget_text">EXAMPLE</string>
+    <string name="add_widget">Add widget</string>
+    <string name="empty_view_text">No recipe selected</string>
 </resources>

@@ -17,12 +17,10 @@ import java.util.List;
  */
 
 public class MainActivityViewModel extends ViewModel {
-    private BakingRepository bakingRepository;
     private LiveData<List<RecipeEntry>> recipeEntries;
 
     public MainActivityViewModel(BakingRepository bakingRepository) {
-        this.bakingRepository = bakingRepository;
-        this.recipeEntries = bakingRepository.getRecipes();
+        this.recipeEntries = bakingRepository.getRecipeEntries();
     }
 
     public LiveData<List<Recipe>> getRecipes() {

@@ -59,6 +59,7 @@
     </android.support.v7.widget.CardView>
 
     <android.support.design.widget.FloatingActionButton
+        android:id="@+id/addToWidgetBtn"
         android:src="@drawable/ic_widgets_white_24dp"
         android:layout_height="wrap_content"
         android:layout_width="wrap_content"

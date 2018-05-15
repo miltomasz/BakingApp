@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -15,10 +16,10 @@ import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.plumya.bakingapp.IngredientsWidgetProvider;
 import com.plumya.bakingapp.R;
 import com.plumya.bakingapp.data.model.Recipe;
 import com.plumya.bakingapp.data.model.Step;
+import com.plumya.bakingapp.data.widget.IngredientsWidgetProvider;
 import com.plumya.bakingapp.di.Injector;
 import com.plumya.bakingapp.ui.fragments.RecipeStepDetailViewFragment;
 import com.plumya.bakingapp.ui.fragments.RecipeStepsFragment;
@@ -121,6 +122,11 @@ public class RecipeStepsActivity extends AppCompatActivity implements RecipeStep
         }
     }
 
+    @Override
+    public void onAddToWidgetClick(String recipeName) {
+        addToWidget(getCurrentFocus(), recipeName);
+    }
+
     public RecipeStepDetailViewFragment createRecipeStepDetailViewFragment(long stepId, List<Step> steps) {
         RecipeStepDetailViewFragment recipeStepDetailViewFragment = new RecipeStepDetailViewFragment();
         Bundle arguments = new Bundle();
@@ -137,36 +143,20 @@ public class RecipeStepsActivity extends AppCompatActivity implements RecipeStep
         return STEP_NOT_FOUND;
     }
 
-    public void addToWidget(View view) {
-        Log.d(LOG_TAG, "Add to widget...");
-//        AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(this);
-//        int[] appWidgetIds = appWidgetManager.getAppWidgetIds(new ComponentName(this, IngredientsWidgetProvider.class));
-//        //Trigger data update to handle the GridView widgets and force a data refresh
-//        appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetIds, R.id.widget_list_view);
-//
+    private void addToWidget(View view, String recipeName) {
+        Log.d(LOG_TAG, "Add Recipe to widget");
         final long recipeId = getIntent().getLongExtra(RECIPE_ID, -1L);
-//        IngredientsWidgetProvider.updateIngredientWidgets(this, appWidgetManager, appWidgetIds, recipeId);
-
-        PreferenceManager.getDefaultSharedPreferences(this).edit().putLong(RECIPE_ID, recipeId).apply();
-
+        PreferenceManager
+                .getDefaultSharedPreferences(this).edit().putLong(RECIPE_ID, recipeId)
+                .apply();
         Intent intent = new Intent(this, IngredientsWidgetProvider.class);
         intent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
-//        intent.setAction("update_widget");
-// Use an array and EXTRA_APPWIDGET_IDS instead of AppWidgetManager.EXTRA_APPWIDGET_ID,
-// since it seems the onUpdate() is only fired on that:
-        int[] ids = AppWidgetManager.getInstance(getApplication())
+        int[] appWidgetIds = AppWidgetManager.getInstance(getApplication())
                 .getAppWidgetIds(new ComponentName(getApplication(), IngredientsWidgetProvider.class));
-        intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids);
+        intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, appWidgetIds);
         sendBroadcast(intent);
 
-//        try {
-//            Intent updateWidget = new Intent(this, IngredientsWidgetProvider.class);
-//            updateWidget.setAction("update_widget");
-//            updateWidget.putExtra(RECIPE_ID, recipeId);
-//            PendingIntent pending = PendingIntent.getBroadcast(this, 0, updateWidget, PendingIntent.FLAG_CANCEL_CURRENT);
-//            pending.send();
-//        } catch (PendingIntent.CanceledException e) {
-//            Log.e(LOG_TAG,"Error widgetTrial()="+e.toString());
-//        }
+        String message = getString(R.string.added_to_widget, recipeName);
+        Snackbar.make(view, message, Snackbar.LENGTH_LONG).show();
     }
 }

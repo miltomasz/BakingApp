@@ -16,14 +16,11 @@ import java.util.List;
 public interface RecipeDao {
 
     @Query("SELECT id, name, ingredients, steps, servings, image FROM recipes")
-    LiveData<List<RecipeEntry>> getRecipes();
+    LiveData<List<RecipeEntry>> getRecipeEntries();
 
     @Query("SELECT * FROM recipes WHERE id = :id")
-    LiveData<RecipeEntry> getRecipe(long id);
+    LiveData<RecipeEntry> getRecipeEntry(long id);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void bulkInsert(RecipeEntry... recipes);
-
-    @Query("DELETE FROM recipes")
-    void deleteAllRecipes();
 }

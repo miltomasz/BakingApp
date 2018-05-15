@@ -5,6 +5,7 @@ package com.plumya.bakingapp.ui.adapter;
  */
 
 import android.content.Context;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -86,9 +87,9 @@ public class RecipeStepsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         return steps.size() + 1;
     }
 
-    class RegularViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    public class RegularViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         @BindView(R.id.shortDescriptionTv)
-        TextView shortDescriptionTv;
+        public TextView shortDescriptionTv;
 
         @BindView(R.id.fullDescriptionTv)
         TextView fullDescriptionTv;
@@ -114,14 +115,24 @@ public class RecipeStepsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         @BindView(R.id.recipeIngredients)
         TextView recipeIngredientsTv;
 
+        @BindView(R.id.addToWidgetBtn)
+        FloatingActionButton floatingActionButton;
+
         public IngredientsViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
+            floatingActionButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    onClickHandler.onAddToWidgetClick();
+                }
+            });
         }
     }
 
     public interface RecipeStepsOnClickHandler {
         void onClick(long stepId, List<Step> steps);
+        void onAddToWidgetClick();
     }
 }
 

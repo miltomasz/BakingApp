@@ -30,7 +30,7 @@ public class RecipeNetworkDataSource {
 
     private RecipeNetworkDataSource(BakingService bakingService) {
         this.bakingService = bakingService;
-        downloadedRecipes = new MutableLiveData<>();
+        this.downloadedRecipes = new MutableLiveData<>();
     }
 
     public static RecipeNetworkDataSource getInstance(BakingService bakingService) {
@@ -62,5 +62,4 @@ public class RecipeNetworkDataSource {
             }
         });
     }
-
 }

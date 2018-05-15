@@ -1,4 +1,4 @@
-package com.plumya.bakingapp;
+package com.plumya.bakingapp.data.widget;
 
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
@@ -9,7 +9,7 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.widget.RemoteViews;
 
-import com.plumya.bakingapp.data.widget.IngredientListWidgetService;
+import com.plumya.bakingapp.R;
 import com.plumya.bakingapp.ui.list.RecipeStepsActivity;
 
 /**
@@ -56,14 +56,9 @@ public class IngredientsWidgetProvider extends AppWidgetProvider {
 
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
-        // There may be multiple widgets active, so update all of them
         long recipeId = getDefaultRecipeId(context);
+        // There may be multiple widgets active, so update all of them
         updateIngredientWidgets(context, appWidgetManager, appWidgetIds, recipeId);
-//        appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetIds, R.id.widget_list_view);
-
-//        for (int appWidgetId : appWidgetIds) {
-//            updateAppWidget(context, appWidgetManager, appWidgetId, recipeId);
-//        }
     }
 
     private long getDefaultRecipeId(Context context) {

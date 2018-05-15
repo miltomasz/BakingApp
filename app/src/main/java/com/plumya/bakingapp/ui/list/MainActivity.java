@@ -5,6 +5,8 @@ import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.annotation.VisibleForTesting;
+import android.support.test.espresso.idling.CountingIdlingResource;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
@@ -30,6 +32,9 @@ public class MainActivity extends AppCompatActivity implements RecipesAdapter.Re
     private static final int CACHE_SIZE = 20;
     public static final int GRID_COLUMN_COUNT = 3;
 
+    CountingIdlingResource countingIdlingResource =
+            new CountingIdlingResource("MainActivityTest");
+
     private MainActivityViewModel viewModel;
     private RecipesAdapter recipesAdapter;
 
@@ -51,6 +56,7 @@ public class MainActivity extends AppCompatActivity implements RecipesAdapter.Re
         initializeLayoutManager();
         initializeRecyclerView();
         showProgressBar(true);
+        incrementIdlingResource();
 
         MainViewModelFactory factory =
                 Injector.provideMainActivityViewModelFactory(this.getApplicationContext());
@@ -66,6 +72,7 @@ public class MainActivity extends AppCompatActivity implements RecipesAdapter.Re
                 }
                 recipesAdapter.setRecipes(recipes);
                 showProgressBar(false);
+                decrementIdlingResource();
             }
         });
     }
@@ -107,5 +114,24 @@ public class MainActivity extends AppCompatActivity implements RecipesAdapter.Re
         Intent intent = new Intent(this, RecipeStepsActivity.class);
         intent.putExtra(RecipeStepsActivity.RECIPE_ID, recipe.id);
         startActivity(intent);
+    }
+
+    /**
+     *
+     * @return MainActvity's idling resource for Espresso testing
+     */
+    @VisibleForTesting
+    public CountingIdlingResource getEspressoIdlingResourceForMainActivity() {
+        return countingIdlingResource;
+    }
+
+    @VisibleForTesting
+    private void decrementIdlingResource() {
+        countingIdlingResource.decrement();
+    }
+
+    @VisibleForTesting
+    private void incrementIdlingResource() {
+        countingIdlingResource.increment();
     }
 }

@@ -56,6 +56,7 @@ public class RecipeStepsFragment extends Fragment implements RecipeStepsAdapter.
 
     public interface OnItemClickListener {
         void onItemSelected(long stepId, List<Step> steps);
+        void onAddToWidgetClick(String recipeName);
     }
 
     private class RecipeObserver implements Observer<Recipe> {
@@ -70,6 +71,7 @@ public class RecipeStepsFragment extends Fragment implements RecipeStepsAdapter.
                         RecipeUtils.displayIngredients(getActivity(), recipe)
                 );
             }
+            getActivity().setTitle(recipe.name);
             showProgressBar(false);
         }
 
@@ -93,7 +95,6 @@ public class RecipeStepsFragment extends Fragment implements RecipeStepsAdapter.
                     + " must implement OnImageClickListener");
         }
     }
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -147,5 +148,11 @@ public class RecipeStepsFragment extends Fragment implements RecipeStepsAdapter.
     @Override
     public void onClick(long stepId, List<Step> steps) {
         callback.onItemSelected(stepId, steps);
+    }
+
+    @Override
+    public void onAddToWidgetClick() {
+        String title = getActivity().getTitle().toString();
+        callback.onAddToWidgetClick(title);
     }
 }

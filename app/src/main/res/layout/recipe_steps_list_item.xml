@@ -34,5 +34,5 @@
         card_view:layout_constraintEnd_toEndOf="parent"
         card_view:layout_constraintStart_toStartOf="parent"
         card_view:layout_constraintTop_toBottomOf="@+id/shortDescriptionTv"
-        tools:text="Description: Elo...m" />
+        tools:text="Description: test, test" />
 </android.support.constraint.ConstraintLayout>

@@ -11,4 +11,5 @@
     <string name="add_widget">Add widget</string>
     <string name="empty_view_text">No recipe selected</string>
     <string name="added_to_widget">%1$s ingredients added to widget</string>
+    <string name="steps_servings">"%1$s steps, %2$s servings"</string>
 </resources>

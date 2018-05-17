@@ -47,9 +47,9 @@ public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.ViewHold
     public void onBindViewHolder(ViewHolder holder, int position) {
         Recipe recipe = recipes.get(position);
         holder.recipeNameTv.setText(recipe.name);
-        String stepServingsCount =
-                String.format("%s steps, %s servings",
-                        recipe.steps == null ? "0" : recipe.steps.size() + "", recipe.servings + "");
+        String stepsCount = recipe.steps == null ? "0" : String.valueOf(recipe.steps.size());
+        String servingsCount = String.valueOf(recipe.servings);
+        String stepServingsCount = context.getString(R.string.steps_servings, stepsCount, servingsCount);
         holder.stepsServingsTv.setText(stepServingsCount);
     }
 

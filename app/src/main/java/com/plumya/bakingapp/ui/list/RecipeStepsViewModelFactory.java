@@ -13,11 +13,9 @@ import com.plumya.bakingapp.data.BakingRepository;
 public class RecipeStepsViewModelFactory  extends ViewModelProvider.NewInstanceFactory {
 
     private final BakingRepository bakingRepository;
-//    private final long recipeId;
 
     public RecipeStepsViewModelFactory(BakingRepository repository) {
         this.bakingRepository = repository;
-//        this.recipeId = recipeId;
     }
 
     @NonNull

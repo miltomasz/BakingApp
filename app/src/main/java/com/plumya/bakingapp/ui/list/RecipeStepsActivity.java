@@ -10,11 +10,8 @@ import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
-import android.widget.ProgressBar;
-import android.widget.TextView;
 
 import com.plumya.bakingapp.R;
 import com.plumya.bakingapp.data.model.Recipe;
@@ -28,8 +25,6 @@ import com.plumya.bakingapp.ui.view.RecipeStepDetailViewActivity;
 import java.util.ArrayList;
 import java.util.List;
 
-import butterknife.BindView;
-
 /**
  * Created by miltomasz on 18/04/18.
  */
@@ -37,21 +32,12 @@ import butterknife.BindView;
 public class RecipeStepsActivity extends AppCompatActivity implements RecipeStepsFragment.OnItemClickListener {
 
     public static final String RECIPE_ID = "recipeId";
+    public static final int FIRST_ITEM = 0;
     public static final int STEP_NOT_FOUND = -1;
 
     private static final String LOG_TAG = RecipeStepsActivity.class.getSimpleName();
-    public static final int FIRST_ITEM = 0;
 
     private boolean twoPane;
-
-    @BindView(R.id.recyclerview_recipe_steps)
-    RecyclerView recipesRv;
-
-    @BindView(R.id.pb_loading_indicator)
-    ProgressBar progressBar;
-
-    @BindView(R.id.tv_error_message_display)
-    TextView emptyErrorTv;
 
     private class RecipeObserver implements Observer<Recipe> {
         private final Bundle savedInstanceState;
@@ -124,7 +110,8 @@ public class RecipeStepsActivity extends AppCompatActivity implements RecipeStep
 
     @Override
     public void onAddToWidgetClick(String recipeName) {
-        addToWidget(getCurrentFocus(), recipeName);
+        View rootView = getWindow().getDecorView().findViewById(android.R.id.content);
+        addToWidget(rootView, recipeName);
     }
 
     public RecipeStepDetailViewFragment createRecipeStepDetailViewFragment(long stepId, List<Step> steps) {

@@ -4,6 +4,7 @@ import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DividerItemDecoration;
@@ -39,6 +40,7 @@ public class RecipeStepsFragment extends Fragment implements RecipeStepsAdapter.
     private static final String LOG_TAG = RecipeStepsActivity.class.getSimpleName();
 
     public static final String RECIPE_ID = "recipeId";
+    private static final String STEPS_POSITION = "stepsPosition";
 
     private RecipeStepsAdapter recipeStepsAdapter;
     private RecipeStepsActivityViewModel viewModel;
@@ -53,6 +55,7 @@ public class RecipeStepsFragment extends Fragment implements RecipeStepsAdapter.
     TextView emptyErrorTv;
 
     private OnItemClickListener callback;
+    private Parcelable layoutManagerSavedState;
 
     public interface OnItemClickListener {
         void onItemSelected(long stepId, List<Step> steps);
@@ -66,12 +69,14 @@ public class RecipeStepsFragment extends Fragment implements RecipeStepsAdapter.
                 showEmptyTextView();
             } else {
                 showRecyclerView();
+                recipeStepsAdapter.setIngredientsTag(recipe.name);
                 recipeStepsAdapter.setSteps(recipe.steps);
                 recipeStepsAdapter.setIngredientsText(
                         RecipeUtils.displayIngredients(getActivity(), recipe)
                 );
+                setLastScrollPosition();
             }
-            getActivity().setTitle(recipe.name);
+            setTitle(recipe.name);
             showProgressBar(false);
         }
 
@@ -116,6 +121,31 @@ public class RecipeStepsFragment extends Fragment implements RecipeStepsAdapter.
 
         // Return the root view
         return rootView;
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelable(STEPS_POSITION,
+                recipesRv.getLayoutManager().onSaveInstanceState());
+    }
+
+    @Override
+    public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
+        super.onViewStateRestored(savedInstanceState);
+        if (savedInstanceState != null) {
+            layoutManagerSavedState = savedInstanceState.getParcelable(STEPS_POSITION);
+        }
+    }
+
+    private void setTitle(@Nullable String recipeName) {
+        getActivity().setTitle(recipeName);
+    }
+
+    private void setLastScrollPosition() {
+        if (layoutManagerSavedState != null) {
+            recipesRv.getLayoutManager().onRestoreInstanceState(layoutManagerSavedState);
+        }
     }
 
     private void showProgressBar(boolean show) {

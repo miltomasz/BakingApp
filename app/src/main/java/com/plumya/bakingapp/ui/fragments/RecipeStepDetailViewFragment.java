@@ -85,11 +85,17 @@ public class RecipeStepDetailViewFragment extends Fragment implements ExoPlayer.
                 BitmapFactory.decodeResource(getResources(), R.drawable.question_mark)
         );
 
-        Bundle arguments = getArguments();
-        if (arguments != null) {
-            stepId = arguments.getLong(STEP_ID, DEFAULT_VALUE);
-            steps = (ArrayList<Step>) arguments.getSerializable(STEPS);
+        if (savedInstanceState == null) {
+            Bundle arguments = getArguments();
+            if (arguments != null) {
+                stepId = arguments.getLong(STEP_ID, DEFAULT_VALUE);
+                steps = (ArrayList<Step>) arguments.getSerializable(STEPS);
+            }
+        } else {
+            stepId = savedInstanceState.getLong(STEP_ID);
+            steps = (ArrayList<Step>) savedInstanceState.getSerializable(STEPS);
         }
+
         if (steps != null) {
             initializeIterator();
             setIteratorCursor();
@@ -100,6 +106,13 @@ public class RecipeStepDetailViewFragment extends Fragment implements ExoPlayer.
             initializePlayer(Uri.parse(step.videoURL));
         }
         return rootView;
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putLong(STEP_ID, stepId);
+        outState.putSerializable(STEPS, (ArrayList<Step>) steps);
     }
 
     /**
@@ -208,7 +221,6 @@ public class RecipeStepDetailViewFragment extends Fragment implements ExoPlayer.
 
         // Start the Media Session since the activity is active.
         mediaSession.setActive(true);
-
     }
 
     /**
@@ -220,16 +232,6 @@ public class RecipeStepDetailViewFragment extends Fragment implements ExoPlayer.
 
     public void setSteps(List<Step> steps) {
         this.steps = steps;
-    }
-
-    public void selectedStep(long stepId, List<Step> steps) {
-        this.stepId = stepId;
-        this.steps = steps;
-        initializeIterator();
-        setIteratorCursor();
-        initializeMediaSession();
-        Step step = prepareSelectedStep();
-        initializePlayer(Uri.parse(step.videoURL));
     }
 
     private void setIteratorCursor() {
@@ -272,6 +274,14 @@ public class RecipeStepDetailViewFragment extends Fragment implements ExoPlayer.
             setStepInstructions(step);
             setStepVideo(step);
             stepId = step.id;
+        }
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        if (exoPlayer != null) {
+            exoPlayer.stop();
         }
     }
 

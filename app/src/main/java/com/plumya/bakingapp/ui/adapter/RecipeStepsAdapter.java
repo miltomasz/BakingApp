@@ -5,7 +5,11 @@ package com.plumya.bakingapp.ui.adapter;
  */
 
 import android.content.Context;
+import android.content.res.ColorStateList;
+import android.graphics.Color;
+import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,6 +26,8 @@ import butterknife.ButterKnife;
 
 public class RecipeStepsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
+    public static final String FAB_ENABLED = "FAB_ENABLED";
+
     private final int INGREDIENTS_VIEW_TYPE = 1;
     private final int REGULAR_VIEW_TYPE = 0;
 
@@ -29,6 +35,7 @@ public class RecipeStepsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     private String ingredientsText;
     private RecipeStepsOnClickHandler onClickHandler;
     private Context context;
+    private String ingredientsTag;
 
     public RecipeStepsAdapter(Context context, RecipeStepsOnClickHandler onClickHandler) {
         this.context = context;
@@ -65,6 +72,19 @@ public class RecipeStepsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         if (holder.getItemViewType() == INGREDIENTS_VIEW_TYPE) {
             IngredientsViewHolder ingredientsViewHolder = (IngredientsViewHolder) holder;
             ingredientsViewHolder.recipeIngredientsTv.setText(ingredientsText);
+            boolean enabled = getFabDisabled() == null || !getFabDisabled().equals(ingredientsTag);
+            if (enabled) {
+                ingredientsViewHolder.floatingActionButton
+                        .setOnClickListener(new AddToWidgetOnClickListener(ingredientsViewHolder.floatingActionButton));
+                ingredientsViewHolder.floatingActionButton.setClickable(true);
+                ingredientsViewHolder.floatingActionButton
+                        .setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(context, R.color.colorAccent)));
+            } else {
+                ingredientsViewHolder.floatingActionButton.setOnClickListener(null);
+                ingredientsViewHolder.floatingActionButton.setClickable(false);
+                ingredientsViewHolder.floatingActionButton
+                        .setBackgroundTintList(ColorStateList.valueOf(Color.GRAY));
+            }
         } else {
             Step step = steps.get(position - 1);
             RegularViewHolder regularViewHolder = (RegularViewHolder) holder;
@@ -85,6 +105,10 @@ public class RecipeStepsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     public int getItemCount() {
         if (steps == null) return 0;
         return steps.size() + 1;
+    }
+
+    public void setIngredientsTag(String ingredientsTag) {
+        this.ingredientsTag = ingredientsTag;
     }
 
     public class RegularViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
@@ -121,18 +145,42 @@ public class RecipeStepsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         public IngredientsViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
-            floatingActionButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    onClickHandler.onAddToWidgetClick();
-                }
-            });
+            floatingActionButton.setOnClickListener(new AddToWidgetOnClickListener(floatingActionButton));
         }
+    }
+
+    private String getFabDisabled() {
+        return PreferenceManager.getDefaultSharedPreferences(context)
+                .getString(FAB_ENABLED, null);
     }
 
     public interface RecipeStepsOnClickHandler {
         void onClick(long stepId, List<Step> steps);
         void onAddToWidgetClick();
+    }
+
+    private class AddToWidgetOnClickListener implements View.OnClickListener {
+        private FloatingActionButton fab;
+
+        public AddToWidgetOnClickListener(FloatingActionButton fab) {
+            this.fab = fab;
+        }
+
+        @Override
+        public void onClick(View v) {
+            onClickHandler.onAddToWidgetClick();
+            setFabDisabled();
+        }
+
+        private void setFabDisabled() {
+            fab.setOnClickListener(null);
+            fab.setClickable(false);
+            fab.setBackgroundTintList(ColorStateList.valueOf(Color.GRAY));
+            PreferenceManager.getDefaultSharedPreferences(context)
+                    .edit()
+                    .putString(FAB_ENABLED, ingredientsTag)
+                    .apply();
+        }
     }
 }
 

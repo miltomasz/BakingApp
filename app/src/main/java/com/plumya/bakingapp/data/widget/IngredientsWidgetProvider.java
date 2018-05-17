@@ -15,6 +15,7 @@ import com.plumya.bakingapp.ui.list.RecipeStepsActivity;
 /**
  * Implementation of App Widget functionality.
  */
+
 public class IngredientsWidgetProvider extends AppWidgetProvider {
 
     private static final String RECIPE_ID = "recipeId";
@@ -22,6 +23,7 @@ public class IngredientsWidgetProvider extends AppWidgetProvider {
 
     public static void updateIngredientWidgets(Context context, AppWidgetManager appWidgetManager,
                                                int[] appWidgetIds, long selectedRecipeId) {
+        // update all widgets
         for (int appWidgetId : appWidgetIds) {
             updateAppWidget(context, appWidgetManager, appWidgetId, selectedRecipeId);
         }

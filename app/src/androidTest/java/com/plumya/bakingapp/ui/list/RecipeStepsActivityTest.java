@@ -88,6 +88,7 @@ public class RecipeStepsActivityTest {
                 .check(matches(isDisplayed()))
                 .perform(click());
 
+        // check if correct intent was sent
         intended(allOf(
                 hasComponent(RecipeStepDetailViewActivity.class.getName()),
                 hasExtra(RecipeStepDetailViewActivity.STEP_ID, 1L))

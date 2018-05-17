@@ -1,9 +1,10 @@
 package com.plumya.bakingapp.ui.list;
 
-import android.arch.core.util.Function;
 import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.Transformations;
+import android.arch.lifecycle.MutableLiveData;
+import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModel;
+import android.support.annotation.Nullable;
 
 import com.plumya.bakingapp.data.BakingRepository;
 import com.plumya.bakingapp.data.database.RecipeEntry;
@@ -17,18 +18,28 @@ import java.util.List;
  */
 
 public class MainActivityViewModel extends ViewModel {
-    private LiveData<List<RecipeEntry>> recipeEntries;
+    private MutableLiveData<List<Recipe>> recipes = new MutableLiveData<>();
 
     public MainActivityViewModel(BakingRepository bakingRepository) {
-        this.recipeEntries = bakingRepository.getRecipeEntries();
-    }
-
-    public LiveData<List<Recipe>> getRecipes() {
-        return Transformations.map(recipeEntries, new Function<List<RecipeEntry>, List<Recipe>>() {
+        bakingRepository.getRecipeEntries().observeForever(new Observer<List<RecipeEntry>>() {
             @Override
-            public List<Recipe> apply(List<RecipeEntry> input) {
-                return RecipeUtils.toModel(input);
+            public void onChanged(@Nullable List<RecipeEntry> recipeEntries) {
+                if (recipesFound(recipeEntries)) {
+                    recipes.postValue(RecipeUtils.toModel(recipeEntries));
+                }
+            }
+
+            private boolean recipesFound(@Nullable List<RecipeEntry> recipeEntries) {
+                return recipeEntries != null && recipeEntries.size() > 0;
             }
         });
+    }
+
+    /**
+     * Exposes list of recipes for view as LiveData
+     * @return
+     */
+    public LiveData<List<Recipe>> getRecipes() {
+        return recipes;
     }
 }

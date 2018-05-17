@@ -122,7 +122,8 @@ public class BakingRepository {
 
         @Override
         public void onInserted(int position, int count) {
-            Log.d(LOG_TAG, "Values inserted");
+            Log.d(LOG_TAG, "Values inserted. Add new recipes");
+            recipeDao.bulkInsert(RecipeUtils.toEntries(newRecipes));
         }
 
         @Override
@@ -137,7 +138,7 @@ public class BakingRepository {
 
         @Override
         public void onChanged(int position, int count, Object payload) {
-            Log.d(LOG_TAG, "Values changed");
+            Log.d(LOG_TAG, "Values changed. Add/replace recipes if there are new ones");
             recipeDao.bulkInsert(RecipeUtils.toEntries(newRecipes));
         }
     }

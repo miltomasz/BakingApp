@@ -55,8 +55,8 @@ public class MainActivity extends AppCompatActivity implements RecipesAdapter.Re
 
         initializeLayoutManager();
         initializeRecyclerView();
-        showProgressBar(true);
         incrementIdlingResource();
+        showProgressBar(true);
 
         MainViewModelFactory factory =
                 Injector.provideMainActivityViewModelFactory(this.getApplicationContext());

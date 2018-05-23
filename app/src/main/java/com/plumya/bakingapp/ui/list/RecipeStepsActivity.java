@@ -76,7 +76,8 @@ public class RecipeStepsActivity extends AppCompatActivity implements RecipeStep
                     .commit();
         }
 
-        if (findViewById(R.id.layout_for_recipe_details_view) != null) {
+        boolean isTablet = getResources().getBoolean(R.bool.tablet);
+        if (isTablet) {
             // This LinearLayout will only initially exist in the two-pane tablet case
             twoPane = true;
 

@@ -12,11 +12,18 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
+        <ImageView
+            android:id="@+id/imageView"
+            android:gravity="center_horizontal"
+            android:layout_width="@dimen/video_view_width"
+            android:layout_height="@dimen/video_view_height"
+            android:visibility="gone" />
+
         <com.google.android.exoplayer2.ui.SimpleExoPlayerView
             android:id="@+id/playerView"
             android:gravity="center_horizontal"
-            android:layout_width="400dp"
-            android:layout_height="269dp" />
+            android:layout_width="@dimen/video_view_width"
+            android:layout_height="@dimen/video_view_height" />
 
         <TextView
             android:id="@+id/recipeStepInstructionTv"

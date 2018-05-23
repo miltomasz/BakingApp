@@ -23,7 +23,7 @@ allprojects {
 }
 
 ext {
-    roomVersion = '1.1.0-beta2'
+    roomVersion = '1.1.0'
     retrofitVersion = '2.4.0'
     butterKnifeVersion = '8.8.1'
     archVersion = '1.1.1'

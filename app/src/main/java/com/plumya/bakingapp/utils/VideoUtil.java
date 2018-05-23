@@ -2,6 +2,7 @@ package com.plumya.bakingapp.utils;
 
 import android.text.TextUtils;
 
+import com.plumya.bakingapp.R;
 import com.plumya.bakingapp.data.model.Step;
 
 /**
@@ -11,6 +12,10 @@ import com.plumya.bakingapp.data.model.Step;
 public class VideoUtil {
 
     public static final String NO_VIDEO_AVAILABLE = "";
+    private static final String NUTELLA_PIE = "Nutella Pie";
+    private static final String BROWNIES = "Brownies";
+    private static final String CHEESECAKE = "Cheesecake";
+    private static final String YELLOW_CAKE = "Yellow Cake";
 
     private VideoUtil() {}
 
@@ -29,6 +34,16 @@ public class VideoUtil {
             }
         } else {
             return videoUrl;
+        }
+    }
+
+    public static int getDefaultRecipeImage(String recipeName) {
+        switch (recipeName) {
+            case NUTELLA_PIE: return R.drawable.nutella_pie;
+            case BROWNIES: return R.drawable.brownies;
+            case CHEESECAKE: return R.drawable.cheesecake;
+            case YELLOW_CAKE: return R.drawable.yellow_cake;
+            default:return R.drawable.recipe_placeholder;
         }
     }
 }

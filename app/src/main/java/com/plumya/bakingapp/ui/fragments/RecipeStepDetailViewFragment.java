@@ -1,6 +1,5 @@
 package com.plumya.bakingapp.ui.fragments;
 
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -17,6 +16,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.google.android.exoplayer2.DefaultLoadControl;
@@ -38,7 +38,8 @@ import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
 import com.plumya.bakingapp.R;
 import com.plumya.bakingapp.data.model.Step;
-import com.plumya.bakingapp.utils.VideoUtil;
+import com.squareup.picasso.Callback;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -83,6 +84,9 @@ public class RecipeStepDetailViewFragment extends Fragment implements ExoPlayer.
     @BindView(R.id.nextBtn)
     Button nextBtn;
 
+    @BindView(R.id.imageView)
+    ImageView imageView;
+
     private long stepId;
     private List<Step> steps;
     private ListIterator<Step> iterator;
@@ -100,12 +104,12 @@ public class RecipeStepDetailViewFragment extends Fragment implements ExoPlayer.
         final View rootView = inflater.inflate(
                 R.layout.fragment_recipe_step_detail_view, container, false);
         ButterKnife.bind(this, rootView);
+        return rootView;
+    }
 
-        // set question mark image if no video Url
-        playerView.setDefaultArtwork(
-                BitmapFactory.decodeResource(getResources(), R.drawable.question_mark)
-        );
-
+    @Override
+    public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
+        super.onViewStateRestored(savedInstanceState);
         if (savedInstanceState == null) {
             Bundle arguments = getArguments();
             if (arguments != null) {
@@ -118,7 +122,11 @@ public class RecipeStepDetailViewFragment extends Fragment implements ExoPlayer.
             videoPosition = savedInstanceState.getLong(VIDEO_POSITION);
             videoState = savedInstanceState.getBoolean(VIDEO_STATE);
         }
+    }
 
+    @Override
+    public void onStart() {
+        super.onStart();
         if (steps != null) {
             initializeIterator();
             setIteratorCursor();
@@ -126,10 +134,39 @@ public class RecipeStepDetailViewFragment extends Fragment implements ExoPlayer.
             // Initialize the Media Session.
             initializeMediaSession();
             // Initialize the player.
-            Step step = prepareSelectedStep();
-            initializePlayer(step);
+            if (Util.SDK_INT > 23) {
+                Step step = prepareSelectedStep();
+                initializePlayer(step);
+            }
         }
-        return rootView;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (steps != null) {
+            if (Util.SDK_INT <= 23) {
+                Step step = prepareSelectedStep();
+                initializePlayer(step);
+            }
+        }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        if (Util.SDK_INT <= 23) {
+            releasePlayer();
+        }
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        closeMediaSession();
+        if (Util.SDK_INT > 23) {
+            releasePlayer();
+        }
     }
 
     @Override
@@ -171,6 +208,17 @@ public class RecipeStepDetailViewFragment extends Fragment implements ExoPlayer.
     }
 
     /**
+     * Stop and release ExoPlayer
+     */
+    private void releasePlayer() {
+        if (exoPlayer != null) {
+            exoPlayer.stop();
+            exoPlayer.release();
+            exoPlayer = null;
+        }
+    }
+
+    /**
      * Set new media Uri for media source.
      * @param mediaUri The URI of the sample to play.
      */
@@ -187,19 +235,51 @@ public class RecipeStepDetailViewFragment extends Fragment implements ExoPlayer.
     }
 
     /**
-     * Prepare URI for step's video
+     * Prepare Step's video to display
      * @param step
      */
     private void setStepVideo(Step step) {
-        String videoUrl = VideoUtil.urlForPlayback(step);
-        if (TextUtils.isEmpty(videoUrl)) {
-            showSnackbar(getString(R.string.no_video_available_msg));
-            // Remove playback controllers
-            playerView.setUseController(false);
+        if (TextUtils.isEmpty(step.videoURL)) {
+            showImageView();
+
+            if (TextUtils.isEmpty(step.thumbnailURL)) {
+                setDefaultImage();
+            } else {
+                Picasso.get()
+                        .load(step.thumbnailURL)
+                        .placeholder(R.drawable.question_mark)
+                        .into(imageView, new Callback() {
+                            @Override
+                            public void onSuccess() {
+                            }
+
+                            @Override
+                            public void onError(Exception e) {
+                                if (isAdded()) {
+                                    setDefaultImage();
+                                }
+                            }
+                        });
+            }
         } else {
-            playerView.setUseController(true);
+            showPlayerView();
+            setMediaUri(Uri.parse(step.videoURL));
         }
-        setMediaUri(Uri.parse(videoUrl));
+    }
+
+    private void showImageView() {
+        imageView.setVisibility(View.VISIBLE);
+        playerView.setVisibility(View.GONE);
+    }
+
+    private void showPlayerView() {
+        imageView.setVisibility(View.GONE);
+        playerView.setVisibility(View.VISIBLE);
+    }
+
+    private void setDefaultImage() {
+        imageView.setImageResource(R.drawable.recipe_placeholder);
+        showSnackbar(getString(R.string.no_video_available_msg));
     }
 
     private void showSnackbar(String message) {
@@ -289,6 +369,10 @@ public class RecipeStepDetailViewFragment extends Fragment implements ExoPlayer.
         mediaSession.setActive(true);
     }
 
+    private void closeMediaSession() {
+        mediaSession = null;
+    }
+
     /**
      * Initialize iterator to iterate through steps collection
      */
@@ -344,16 +428,6 @@ public class RecipeStepDetailViewFragment extends Fragment implements ExoPlayer.
             resetVideoState();
             stepId = step.id;
             setButtonsVisibility();
-        }
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        if (exoPlayer != null) {
-            exoPlayer.stop();
-            exoPlayer.release();
-            exoPlayer = null;
         }
     }
 
